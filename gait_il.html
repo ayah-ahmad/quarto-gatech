@@ -189,7 +189,10 @@
 <p>The simulation is only as good as the muscle-level solution the policy finds.</p>
 </div>
 <aside class="notes">
-<p>~35 s. Set up the promise of simulation-in-the-loop design, then the catch.</p>
+<p><strong>[~35 s]</strong></p>
+<p>Robotic assistive devices could make a real difference in mobility after a stroke or spinal cord injury. The bottleneck is tuning their controllers, which takes long, expensive human experiments, and the people who would benefit most are usually the least able to walk for hours.</p>
+<p><em>[click]</em> One alternative is muscle-driven imitation learning. We train a policy to reproduce a person’s recorded walking on a musculoskeletal model, and then use that simulation in place of the participant.</p>
+<p><em>[click]</em> But the simulation is only useful if the muscle activity underneath the motion is right, not just the motion itself.</p>
 <style type="text/css">
         span.MJX_Assistive_MathML {
           position:absolute!important;
@@ -224,7 +227,10 @@
 <p>Both frameworks tracked healthy kinematics, yet differed sharply in EMG fidelity. Kinematic agreement is a weak indicator of correct muscle activity.</p>
 </div>
 <aside class="notes">
-<p>~40 s. HyFyDy 0.164 / 0.40 vs MuJoCo 0.344 / 0.11.</p>
+<p><strong>[~40 s]</strong></p>
+<p>We saw this directly in our healthy-gait benchmark. We trained two state-of-the-art frameworks, HyFyDy and MuJoCo, to track the same healthy walking, and compared their simulated muscle activations to measured EMG.</p>
+<p>HyFyDy had a pooled RMSE of 0.164 and a correlation of 0.40. MuJoCo had roughly double the error, 0.344, and almost no correlation, 0.11.</p>
+<p><em>[click]</em> Both tracked the joint angles, but they got there with very different muscle activity. So kinematic agreement on its own tells us little about whether the muscles are doing the right thing.</p>
 <style type="text/css">
         span.MJX_Assistive_MathML {
           position:absolute!important;
@@ -258,7 +264,10 @@
 <p>An effort-minimizing policy tracking patient kinematics may reproduce the joint angles through a mechanism the patient does not use.</p>
 </div>
 <aside class="notes">
-<p>~35 s. This is the core risk the project tests.</p>
+<p><strong>[~35 s]</strong></p>
+<p>In healthy walking that gap is manageable. The policy’s reward combines an imitation term and an effort penalty, and healthy gait is close to metabolically optimal, so the two objectives point the same way.</p>
+<p><em>[click]</em> After a stroke or an incomplete spinal cord injury, they don’t. The patient’s kinematics come from inefficient neural drive.</p>
+<p><em>[click]</em> So a policy that minimizes effort while tracking patient kinematics may find an efficient way to reproduce the same joint angles, using a muscle strategy the patient doesn’t actually use. That’s the core risk this project tests.</p>
 <style type="text/css">
         span.MJX_Assistive_MathML {
           position:absolute!important;
@@ -291,7 +300,11 @@
 </div>
 </div>
 <aside class="notes">
-<p>~35 s.</p>
+<p><strong>[~35 s]</strong></p>
+<p>The goal is to find out whether that wrong muscle solution happens, how to detect it, and what prevents it. We have three hypotheses.</p>
+<p><em>[click]</em> First, baseline policies will track stroke kinematics but match EMG less closely than in matched able-bodied controls, and the gap will be largest on the paretic side.</p>
+<p><em>[click]</em> Second, constraining the controller with muscle synergies will improve EMG fidelity without meaningfully hurting kinematic tracking.</p>
+<p><em>[click]</em> Third, scaling the model to each person’s body will improve tracking, but will matter less for EMG fidelity than the controller change.</p>
 <style type="text/css">
         span.MJX_Assistive_MathML {
           position:absolute!important;
@@ -351,7 +364,12 @@ Controller vs. model effect size
 </table>
 <p>Every participant is run in all four conditions. Personalization is geometric only: it does not model patient-specific weakness, spasticity, or muscle properties.</p>
 <aside class="notes">
-<p>~45 s. Walk across the rows: baseline vs.&nbsp;synergy is H2, generic vs.&nbsp;scaled is H3.</p>
+<p><strong>[~45 s]</strong></p>
+<p>To test these, we use a two-by-two within-participant design. The rows are the controller and the columns are the model.</p>
+<p>The baseline controller outputs one command per muscle, which is our existing pipeline unchanged from the healthy benchmark. Comparing it with matched controls tests H1.</p>
+<p>The synergy controller outputs only a few commands, mapped to muscles through weights taken from the participant’s own EMG. Going down a column is H2.</p>
+<p>Going across a row, from the generic HyFyDy model to one scaled with OpenSim scale factors, is H3. The bottom-right cell lets us compare the two effect sizes.</p>
+<p>Every participant runs all four conditions. One caveat: personalization is geometric only. We aren’t modeling weakness, spasticity, or muscle properties.</p>
 <style type="text/css">
         span.MJX_Assistive_MathML {
           position:absolute!important;
@@ -385,7 +403,10 @@ Controller vs. model effect size
 </div>
 <p><span class="src">Data: <span class="citation" data-cites="vancriekinge2023"><a href="#/references" role="doc-biblioref" onclick="">[2]</a></span>. Synergy rationale: <span class="citation" data-cites="meyer2016synergies clark2010merging"><a href="#/references" role="doc-biblioref" onclick="">[3]</a>, <a href="#/references" role="doc-biblioref" onclick="">[4]</a></span>.</span></p>
 <aside class="notes">
-<p>~40 s. Emphasize held-out strides.</p>
+<p><strong>[~45 s]</strong></p>
+<p>We use the public Van Criekinge dataset: five stroke survivors, each paired with a matched control. First, we split strides into training and held-out sets, so the synergy weights never see the strides we evaluate on. Marker data becomes the reference motion, and training uses the benchmark’s reward.</p>
+<p>For the synergy controller, we run non-negative matrix factorization per leg over six leg muscles, keeping the fewest synergies that explain 90% of the EMG variance. Timing is not prescribed; the policy still learns when each group fires.</p>
+<p>The primary outcome is EMG fidelity across the gait cycle, per muscle and per leg, with paretic and non-paretic legs reported separately. Kinematic tracking is a check we have to pass, not evidence of a correct muscle solution.</p>
 <style type="text/css">
         span.MJX_Assistive_MathML {
           position:absolute!important;
@@ -427,7 +448,10 @@ Controller vs. model effect size
 </div>
 <div class="tl-legend">Filled: done. Outlined: remaining.</div>
 <aside class="notes">
-<p>~45 s. Be explicit: the feasibility run shows the model can be trained to walk on stroke data; it does not yet show matching kinematics or EMG.</p>
+<p><strong>[~45 s]</strong></p>
+<p>Here’s where things stand. We adopted the Van Criekinge dataset, with 138 able-bodied adults and 50 stroke survivors, as our primary data source, and trained the model to walk on one stroke survivor’s reference motion. To be clear, that shows feasibility only; we haven’t yet evaluated it against their kinematics or EMG. We’ve also computed synergies and automated model scaling.</p>
+<p>Next, we score that first policy, which also tests the evaluation pipeline. Then we select and convert participants, train all four conditions, and finally validate the most informative ones on Shepherd Center data.</p>
+<p><strong>[close, ~10 s]</strong> In short, we’re asking whether a simulated patient that walks right is also using the right muscles, and what it takes to make it so. Thank you, I’m happy to take questions.</p>
 <style type="text/css">
         span.MJX_Assistive_MathML {
           position:absolute!important;
