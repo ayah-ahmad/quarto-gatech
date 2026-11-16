@@ -1,0 +1,202 @@
+/* Styles for gait_il.qmd. Kept deliberately plain: navy text, grays, thin
+   rules, and Tech Gold only as a second data series. */
+
+:root {
+  --navy: #003057;
+  --gold: #b3a369;
+  --gray: #54585a;
+  --rule: #c8ccc6;
+}
+
+/* Statement set apart by spacing and a thin rule, not a colored box. */
+.reveal .takeaway {
+  margin-top: 1.2em;
+  padding-top: 0.6em;
+  border-top: 1px solid var(--rule);
+  color: var(--navy);
+}
+
+.reveal .label {
+  display: block;
+  color: var(--gray);
+  margin-bottom: 0.3em;
+}
+
+/* ---------- Two plain columns separated by a rule ---------- */
+.reveal .two-col {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0;
+  margin-top: 0.6em;
+}
+.reveal .two-col > div { padding: 0 1.2em; }
+.reveal .two-col > div:first-child {
+  padding-left: 0;
+  border-right: 1px solid var(--rule);
+}
+.reveal .two-col.small { font-size: 0.85em; }
+
+.reveal .src {
+  display: block;
+  margin-top: 1em;
+  font-size: 0.6em;
+  color: var(--gray);
+}
+
+/* ---------- Benchmark bars: two panels side by side ---------- */
+.reveal .bench {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 80px;
+  margin-top: 0.6em;
+}
+.reveal .bench .ptitle { margin-bottom: 0.3em; }
+.reveal .bench .ptitle span { color: var(--gray); font-size: 0.8em; }
+.reveal .bench .row {
+  display: grid;
+  grid-template-columns: 170px 1fr 110px;
+  align-items: center;
+  gap: 20px;
+  margin: 12px 0;
+  font-size: 0.8em;
+}
+.reveal .bench .track {
+  height: 52px;
+  border-left: 2px solid var(--gray);
+}
+.reveal .bench .bar { height: 100%; }
+.reveal .bench .bar.hyfydy { background: var(--navy); }
+.reveal .bench .bar.mujoco { background: var(--gold); }
+.reveal .bench .val { font-variant-numeric: tabular-nums; }
+.reveal .bench .axis {
+  display: flex;
+  justify-content: space-between;
+  margin: 0 130px 0 182px;
+  font-size: 0.5em;
+  color: var(--gray);
+}
+.reveal .note {
+  font-size: 0.55em;
+  color: var(--gray);
+  margin-top: 8px;
+}
+/* ---------- Hypotheses ---------- */
+.reveal .hyp-list > div {
+  display: grid;
+  grid-template-columns: 90px 1fr;
+  padding: 0.45em 0;
+  border-top: 1px solid var(--rule);
+}
+.reveal .hyp-list > div > p { display: contents; }
+.reveal .hyp-list .hyp-tag { color: var(--gray); }
+
+/* ---------- 2x2 design table ---------- */
+.reveal table.design {
+  width: 100%;
+  table-layout: fixed;
+  border-collapse: collapse;
+  font-size: 0.72em;
+  margin: 0.4em 0 0.8em 0;
+}
+.reveal table.design th,
+.reveal table.design td {
+  border: 1px solid var(--rule);
+  padding: 22px 26px;
+  vertical-align: top;
+  text-align: left;
+  font-weight: 400;
+}
+.reveal table.design thead th {
+  border-top: none;
+  border-bottom: 2px solid var(--navy);
+}
+.reveal table.design thead th:first-child,
+.reveal table.design tbody th {
+  border-left: none;
+}
+.reveal table.design thead th:first-child { border-bottom-color: transparent; }
+.reveal table.design th span {
+  display: block;
+  font-size: 0.75em;
+  color: var(--gray);
+  margin-top: 4px;
+}
+.reveal table.design td .h {
+  margin-top: 12px;
+  font-size: 0.8em;
+  color: var(--gray);
+}
+
+/* ---------- Pipeline as a numbered row ---------- */
+.reveal ol.pipeline {
+  list-style: none;
+  counter-reset: step;
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 0;
+  margin: 0.2em 0 0.8em 0;
+  padding: 0;
+  font-size: 0.55em;
+  border-top: 2px solid var(--navy);
+}
+.reveal ol.pipeline li {
+  counter-increment: step;
+  padding: 14px 20px 0 0;
+  margin: 0;
+}
+.reveal ol.pipeline li span {
+  display: block;
+  color: var(--navy);
+  font-size: 1.2em;
+  margin-bottom: 4px;
+}
+.reveal ol.pipeline li span::before {
+  content: counter(step) ". ";
+  color: var(--gray);
+}
+
+/* ---------- Progress timeline ---------- */
+.reveal .timeline {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  position: relative;
+  margin: 1em 0 0.4em 0;
+  font-size: 0.62em;
+}
+.reveal .timeline::before {
+  content: "";
+  position: absolute;
+  top: 15px;
+  left: 0;
+  right: 0;
+  border-top: 2px solid var(--rule);
+}
+.reveal .timeline .step {
+  position: relative;
+  padding: 50px 24px 0 0;
+  color: var(--gray);
+}
+.reveal .timeline .step i {
+  position: absolute;
+  top: 2px;
+  left: 0;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  border: 2px solid var(--navy);
+  background: #fff;
+}
+.reveal .timeline .step.done { color: var(--navy); }
+.reveal .timeline .step.done i { background: var(--navy); }
+.reveal .timeline .step.next i { border-width: 4px; }
+.reveal .timeline .step .name { margin-bottom: 8px; }
+.reveal .timeline .step .desc {
+  font-size: 0.85em;
+  color: var(--gray);
+  line-height: 1.3;
+}
+.reveal .tl-legend {
+  font-size: 0.5em;
+  color: var(--gray);
+  margin-top: 1em;
+}

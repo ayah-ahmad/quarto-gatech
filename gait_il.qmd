@@ -1,0 +1,218 @@
+---
+title: "Does Model Personalization Matter?"
+subtitle: "Muscle-Driven Imitation Learning of Pathological Gait"
+author:
+  - name: "<b>Ayah Ahmad</b>"
+    affiliation: Georgia Institute of Technology
+    # email: aahmad302@gatech.edu
+date: last-modified
+date-format: "MMMM D, YYYY"
+format:
+  gatech-revealjs:
+    css: gait_il.css
+bibliography: gait_il.bib
+---
+
+# Motivation
+
+## Motivation: Why simulate patients?
+
+Robotic assistive devices could improve mobility after neurological injury,
+but tuning their controllers takes long, costly human experiments.
+
+::: {.fragment}
+- The people who would benefit most are often least able to walk for hours
+- Muscle-driven imitation learning (IL): train a policy to reproduce recorded
+  walking on a musculoskeletal model, then use the simulation in place of the participant
+:::
+
+::: {.fragment .takeaway}
+The simulation is only as good as the muscle-level solution the policy finds.
+:::
+
+::: notes
+~35 s. Set up the promise of simulation-in-the-loop design, then the catch.
+:::
+
+## Motivation: Kinematics can match while muscles don't
+
+Healthy-gait benchmark: simulated muscle activation vs. measured EMG [@ahmad2026beyond]
+
+```{=html}
+<div class="bench">
+  <div class="panel">
+    <div class="ptitle">RMSE <span>(lower is better)</span></div>
+    <div class="row"><div>HyFyDy</div><div class="track"><div class="bar hyfydy" style="width:41%"></div></div><div class="val">0.164</div></div>
+    <div class="row"><div>MuJoCo</div><div class="track"><div class="bar mujoco" style="width:86%"></div></div><div class="val">0.344</div></div>
+    <div class="axis"><span>0</span><span>0.2</span><span>0.4</span></div>
+  </div>
+  <div class="panel">
+    <div class="ptitle">Correlation r <span>(higher is better)</span></div>
+    <div class="row"><div>HyFyDy</div><div class="track"><div class="bar hyfydy" style="width:80%"></div></div><div class="val">0.40</div></div>
+    <div class="row"><div>MuJoCo</div><div class="track"><div class="bar mujoco" style="width:22%"></div></div><div class="val">0.11</div></div>
+    <div class="axis"><span>0</span><span>0.25</span><span>0.5</span></div>
+  </div>
+</div>
+<div class="note">Pooled across muscles.</div>
+```
+
+::: {.fragment .takeaway}
+Both frameworks tracked healthy kinematics, yet differed sharply in EMG fidelity.
+Kinematic agreement is a weak indicator of correct muscle activity.
+:::
+
+::: notes
+~40 s. HyFyDy 0.164 / 0.40 vs MuJoCo 0.344 / 0.11.
+:::
+
+## Motivation:The problem with pathological gait
+
+::: {.two-col}
+::: {.col}
+[Healthy gait]{.label}
+
+The imitation and effort objectives agree, since healthy walking is close to
+metabolically optimal.
+:::
+::: {.col .fragment fragment-index=1}
+[After stroke or incomplete SCI]{.label}
+
+The kinematics come from inefficient neural drive, so the two objectives conflict.
+:::
+:::
+
+::: {.fragment .takeaway fragment-index=2}
+An effort-minimizing policy tracking patient kinematics may reproduce the joint
+angles through a mechanism the patient does not use.
+:::
+
+::: notes
+~35 s. This is the core risk the project tests.
+:::
+
+# Objectives
+
+## Objectives and Hypotheses
+
+Determine whether the wrong muscle solution occurs, how to detect it, and what
+prevents it.
+
+::: {.hyp-list}
+::: {.hyp .fragment}
+[H1]{.hyp-tag} Baseline policies track stroke kinematics but match EMG less closely
+than matched able-bodied controls, especially on the paretic side.
+:::
+
+::: {.hyp .fragment}
+[H2]{.hyp-tag} Synergy constraints improve EMG fidelity over the baseline without a
+meaningful loss in kinematic tracking.
+:::
+
+::: {.hyp .fragment}
+[H3]{.hyp-tag} Scaling the model to body dimensions improves tracking, with a smaller
+effect on EMG fidelity than the controller change.
+:::
+:::
+
+::: notes
+~35 s.
+:::
+
+# Methodology
+
+## Methodology: 2 × 2 within-participant design
+
+```{=html}
+<table class="design">
+  <colgroup><col style="width:22%"><col style="width:39%"><col style="width:39%"></colgroup>
+  <thead>
+    <tr>
+      <th></th>
+      <th>Generic model<span>default HyFyDy</span></th>
+      <th>Scaled model<span>OpenSim scale factors → HyFyDy</span></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>Baseline controller<span>one command per muscle</span></th>
+      <td>Existing pipeline, unchanged from the healthy benchmark
+        <div class="h">H1: compared with matched controls</div></td>
+      <td>Same controller on a body-scaled model
+        <div class="h">H3: effect of scaling</div></td>
+    </tr>
+    <tr>
+      <th>Synergy controller<span>a few synergy commands</span></th>
+      <td>Muscle weights from the participant's own EMG; timing still learned
+        <div class="h">H2: effect of the controller</div></td>
+      <td>Both changes together
+        <div class="h">Controller vs. model effect size</div></td>
+    </tr>
+  </tbody>
+</table>
+```
+
+Every participant is run in all four conditions. Personalization is geometric only:
+it does not model patient-specific weakness, spasticity, or muscle properties.
+
+::: notes
+~45 s. Walk across the rows: baseline vs. synergy is H2, generic vs. scaled is H3.
+:::
+
+## Methodology: Data, controllers, and evaluation
+
+```{=html}
+<ol class="pipeline">
+  <li><span>Data</span>Van Criekinge dataset; 5 stroke survivors, 5 matched controls</li>
+  <li><span>Split</span>Training and held-out strides, before any synergy extraction</li>
+  <li><span>Reference</span>Markers to reference motion; OpenSim scaling to HyFyDy</li>
+  <li><span>Train</span>Imitation and effort reward, benchmark settings</li>
+  <li><span>Evaluate</span>Simulated activation vs. EMG on held-out strides</li>
+</ol>
+```
+
+::: {.two-col .small}
+::: {.col}
+[Synergy controller]{.label}
+
+Non-negative matrix factorization per leg over six leg muscles, using the fewest
+synergies that explain at least 90% of EMG variance. The policy still learns
+when each group activates.
+:::
+::: {.col}
+[Primary outcome]{.label}
+
+EMG fidelity across the gait cycle, per muscle and per leg, with paretic and
+non-paretic legs reported separately. Kinematic tracking is a necessary check,
+not evidence of a correct muscle solution.
+:::
+:::
+
+[Data: [@vancriekinge2023]. Synergy rationale: [@meyer2016synergies; @clark2010merging].]{.src}
+
+::: notes
+~40 s. Emphasize held-out strides.
+:::
+
+# Preliminary Results
+
+## Preliminary Results: Progress so far
+
+```{=html}
+<div class="timeline">
+  <div class="step done"><i></i><div class="name">Dataset adopted</div><div class="desc">138 able-bodied adults and 50 stroke survivors; now the primary data source</div></div>
+  <div class="step done"><i></i><div class="name">Feasibility run on stroke data</div><div class="desc">Model trained to walk on one stroke survivor's reference motion; not yet evaluated against their kinematics or EMG</div></div>
+  <div class="step done"><i></i><div class="name">Synergies and scaling pipeline</div><div class="desc">Synergies computed for stroke participants; automated per-participant model scaling</div></div>
+  <div class="step next"><i></i><div class="name">Evaluate first policy</div><div class="desc">Score it on the planned metrics and test the evaluation pipeline</div></div>
+  <div class="step "><i></i><div class="name">Select and convert participants</div><div class="desc">Screen for EMG quality and usable strides on both legs</div></div>
+  <div class="step "><i></i><div class="name">Train all four conditions</div><div class="desc">Baseline first, then synergy; all metrics on held-out strides</div></div>
+  <div class="step "><i></i><div class="name">Validate on Shepherd Center data</div><div class="desc">Most informative conditions only</div></div>
+</div>
+<div class="tl-legend">Filled: done. Outlined: remaining.</div>
+```
+
+::: notes
+~45 s. Be explicit: the feasibility run shows the model can be trained to walk
+on stroke data; it does not yet show matching kinematics or EMG.
+:::
+
+## References
